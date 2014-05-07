@@ -18,6 +18,7 @@ import java.util.Map;
  * Created on : 6/5/14.
  */
 public abstract class Request {
+
     protected String url;
     private int connectionTimeOutMillis = 180000;    // default 3 minutes
     private int socketTimeOutMillis = 1800000;    // default 30 minutes
@@ -213,6 +214,115 @@ public abstract class Request {
         return this;
     }
 
+    /**
+     * sets the accept header for the request, if exists then appends
+     * @param headerValue   : header field value to add
+     * @return
+     */
+    public Request accept(String headerValue){
+        final String accept = RequestHeaderFields.ACCEPT.getName();
+        String acceptValue = headers.get(accept);
+        if (acceptValue == null){
+            acceptValue = headerValue;
+        } else {
+            acceptValue = acceptValue + ", " + headerValue;
+        }
+        return this.setHeader(accept, acceptValue);
+    }
+
+    /**
+     * sets the accept encoding header for the request, if exists then appends
+     * @param encoding   : header field value to add
+     * @return
+     */
+    public Request acceptEncoding(String encoding){
+        final String acceptEncoding = RequestHeaderFields.ACCEPT_ENCODING.getName();
+        String encodingValue = headers.get(acceptEncoding);
+        if (encodingValue == null){
+            encodingValue = encoding;
+        } else {
+            encodingValue = encodingValue + ", " + encoding;
+        }
+        return this.setHeader(acceptEncoding, encodingValue);
+    }
+
+    /**
+     * sets the accept language header for the request, if exists then appends
+     * @param language   : header field value to add
+     * @return
+     */
+    public Request acceptLanguage(String language){
+        final String acceptLanguage = RequestHeaderFields.ACCEPT_LANGUAGE.getName();
+        String languageValue = headers.get(acceptLanguage);
+        if (languageValue == null){
+            languageValue = language;
+        } else {
+            languageValue = languageValue + ", " + language;
+        }
+        return this.setHeader(acceptLanguage, languageValue);
+    }
+
+    /**
+     * sets the user agent header for the request, if exists then appends
+     * @param userAgentValue   : header field value to add
+     * @return
+     */
+    public Request userAgent(String userAgentValue){
+        final String userAgent = RequestHeaderFields.USER_AGENT.getName();
+        String agent = headers.get(userAgent);
+        if (agent == null){
+            agent = userAgentValue;
+        } else {
+            agent = agent + " " + userAgentValue;
+        }
+        return this.setHeader(userAgent, agent);
+    }
+
+    /**
+     * sets the Referer header for the request
+     * @param refererValue   : header field value to add
+     * @return
+     */
+    public Request referer(String refererValue){
+        final String referer = RequestHeaderFields.REFERER.getName();
+        return this.setHeader(referer, refererValue);
+    }
+
+    /**
+     * sets the Authorization  header for the request
+     * @param authorizationValue   : header field value to add
+     * @return
+     */
+    public Request authorization(String authorizationValue){
+        final String authorization = RequestHeaderFields.AUTHORIZATION.getName();
+        return this.setHeader(authorization, authorizationValue);
+    }
+
+    /**
+     * sets the if modified since header for the request (use with GET only)
+     * @param dateSince   : header field value to add
+     * @return
+     */
+    public Request ifModifiedSince(String dateSince){
+        final String ifmodsin = RequestHeaderFields.IF_MODIFIED_SINCE.getName();
+        return this.setHeader(ifmodsin, dateSince);
+    }
+
+    /**
+     * sets the Pragma no-cache header for the request
+     * @return
+     */
+    public Request pragmaNoCache(){
+        final String pragma = RequestHeaderFields.PRAGMA.getName();
+        return this.setHeader(pragma, "no-cache");
+    }
+
+    /**
+     * set a request param and return modified request
+     * @param name  : name of teh request param
+     * @param value : value of teh request param
+     * @return
+     */
     public Request setParam(String name, String value) {
         this.params.put(name, value);
         return this;
@@ -224,7 +334,12 @@ public abstract class Request {
         return connectionTimeOutMillis;
     }
 
-    public Request setConnectionTimeOutMillis(int connectionTimeOutMillis) {
+    /**
+     * set connection timeout
+     * @param connectionTimeOutMillis   : milliseconds to timeout connection
+     * @return
+     */
+    public Request connectionTimeOut(int connectionTimeOutMillis) {
         this.connectionTimeOutMillis = connectionTimeOutMillis;
         return this;
     }
@@ -233,7 +348,12 @@ public abstract class Request {
         return socketTimeOutMillis;
     }
 
-    public Request setSocketTimeOutMillis(int socketTimeOutMillis) {
+    /**
+     * set socket time out
+     * @param socketTimeOutMillis   : milliseconds to timeout socket transaction
+     * @return
+     */
+    public Request socketTimeOut(int socketTimeOutMillis) {
         this.socketTimeOutMillis = socketTimeOutMillis;
         return this;
     }
@@ -247,5 +367,28 @@ public abstract class Request {
     public Request addInputStream(String name , InputStream inputStream) {
         this.postStreams.put(name, inputStream);
         return this;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    /**
+     * get specific header value
+     * @param headerName    : name of teh header field to fetch value for
+     * @return  : value of corresponding header field
+     */
+    public String getHeader(String headerName) {
+        return this.headers.get(headerName);
+    }
+
+
+    /**
+     * get specific param value
+     * @param paramName    : name of the param to fetch value for
+     * @return  : value of corresponding param name
+     */
+    public String getParam(String paramName) {
+        return this.params.get(paramName);
     }
 }

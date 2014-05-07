@@ -121,7 +121,6 @@ public class Response {
      */
     public void updateResponse(CloseableHttpResponse resp){
         // TODO: update logging
-        System.out.println("STAT: " + resp.getStatusLine());
         setStatus(resp.getStatusLine().getStatusCode());
         setStatusLine(resp.getStatusLine().toString());
         setHeaders(resp.getAllHeaders());
@@ -129,7 +128,6 @@ public class Response {
         if(entity != null) {
             setContentType(entity.getContentType().getValue());
             setContentLength(entity.getContentLength());
-            System.out.println("LLL: " + contentLength + " || " + contentType);
             if (contentLength != 0 && isTextContent(contentType)) {
                 setContent(parseEntity(entity));
             }
@@ -139,11 +137,10 @@ public class Response {
 
     @Override
     public String toString(){
-        StringBuilder sb = new StringBuilder("Request: ");
-        sb.append(requestLine).append("\n")
-                .append("Status: ").append(statusLine).append("\n\n");
+        StringBuilder sb = new StringBuilder("// Request: ");
+        sb.append(requestLine).append("\n// Status: ").append(statusLine).append("\n// Headers:\n");
         for(String key : responseHeaders.keySet()){
-            sb.append(key).append(" : ").append(responseHeaders.get(key)).append("\n");
+            sb.append("// ").append(key).append(" : ").append(responseHeaders.get(key)).append("\n");
         }
         sb.append("\n// Method : ").append(method).append("\n\n\n")
           .append(content);
