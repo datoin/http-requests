@@ -8,6 +8,14 @@
     <artifactId>http-requests</artifactId>
     <version>0.1.0</version>
 
+    <distributionManagement>
+        <repository>
+            <id>simplyphi-internal</id>
+            <name>simplyphi Internal Repository</name>
+            <url>http://maven.simplyphi.com/internal</url>
+        </repository>
+    </distributionManagement>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
