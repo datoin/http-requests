@@ -126,7 +126,10 @@ public class Response {
         setHeaders(resp.getAllHeaders());
         final HttpEntity entity = resp.getEntity();
         if(entity != null) {
-            setContentType(entity.getContentType().getValue());
+            final Header contentTypeVal = entity.getContentType();
+            if(contentTypeVal != null) {
+                setContentType(contentTypeVal.getValue());
+            }
             setContentLength(entity.getContentLength());
             if (contentLength != 0 && isTextContent(contentType)) {
                 setContent(parseEntity(entity));

@@ -71,6 +71,16 @@ public class RequestTest {
     }
 
     @org.junit.Test
+    public void testAuthorize(){
+        final String authorization = "Basic dXNlcm5hbWU6cGFzc3dvcmQ=";
+        final Request req = Requests.get("anything").authorize("username", "password");
+        Assert.assertEquals("USer Authorization mismatch", authorization,
+                req.getHeader(RequestHeaderFields.AUTHORIZATION.getName()));
+
+
+    }
+
+    @org.junit.Test
     public void testIfModifiedSince() throws Exception {
         final String ifmodsince = "some ifmodsince";
         final Request req = Requests.put("anything").ifModifiedSince(ifmodsince);

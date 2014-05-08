@@ -1,5 +1,6 @@
 package org.datoin.net.http;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -296,6 +297,16 @@ public abstract class Request {
     public Request authorization(String authorizationValue){
         final String authorization = RequestHeaderFields.AUTHORIZATION.getName();
         return this.setHeader(authorization, authorizationValue);
+    }
+
+    public Request authorize(String name, String password){
+        String authString = name + ":" + password;
+        System.out.println("auth string: " + authString);
+        byte[] authEncBytes = Base64.encodeBase64(authString.getBytes());
+        String authStringEnc = new String(authEncBytes);
+        System.out.println("Base64 encoded auth string: " + authStringEnc);
+        return this.authorization("Basic " + authStringEnc);
+
     }
 
     /**
