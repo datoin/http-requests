@@ -5,6 +5,7 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -68,8 +69,8 @@ public abstract class Request {
         CloseableHttpClient client = getClient();
         RequestBuilder postRequest = RequestBuilder.post().setUri(url);
         initHeaders(postRequest);
-        Response response = new Response();
-        response.setMethod(Methods.POST.getMethod());
+        Response response = null;
+
 
 
         final MultipartEntityBuilder reqEntity = MultipartEntityBuilder.create();
@@ -86,18 +87,41 @@ public abstract class Request {
         try {
             final HttpUriRequest uriRequest = postRequest.build();
             resp = client.execute(uriRequest);
-            response.updateResponse(resp);
+            response = new Response(resp);
+            response.setMethod(Methods.POST.getMethod());
             response.setRequestLine(uriRequest.getRequestLine().toString());
         } catch (Exception e) {
             // TODO: log the error
             e.printStackTrace();
         } finally {
             try {
-                resp.close();
                 client.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+        return response;
+    }
+
+    private Response executeHttpRequest(RequestBuilder httpRequest){
+        CloseableHttpClient client = getClient();
+        initHeaders(httpRequest);
+        initParams(httpRequest);
+        Response response = null;
+        CloseableHttpResponse resp = null;
+        try {
+            final HttpUriRequest uriRequest = httpRequest.build();
+            resp = client.execute(uriRequest);
+            // but make sure the response gets closed no matter what
+            // even if do not care about its content
+            response = new Response(resp);
+            response.setMethod(httpRequest.getMethod());
+            response.setRequestLine(uriRequest.getRequestLine().toString());
+        } catch (Exception e) {
+            // TODO: log the error
+            e.printStackTrace();
+        } finally {
+            HttpClientUtils.closeQuietly(client);
         }
         return response;
     }
@@ -107,100 +131,26 @@ public abstract class Request {
      * @return : a formatted Response object
      */
     protected Response get() {
-        CloseableHttpClient client = getClient();
         RequestBuilder getRequest = RequestBuilder.get().setUri(url);
-        Response response = new Response();
-        response.setMethod(Methods.GET.getMethod());
-        initHeaders(getRequest);
-        initParams(getRequest);
-
-        CloseableHttpResponse resp = null;
-        try {
-            final HttpUriRequest uriRequest = getRequest.build();
-            resp = client.execute(uriRequest);
-            // but make sure the response gets closed no matter what
-            // even if do not care about its content
-            response.updateResponse(resp);
-            response.setRequestLine(uriRequest.getRequestLine().toString());
-
-        } catch (Exception e) {
-            // TODO: log the error
-            e.printStackTrace();
-        } finally {
-            try {
-                resp.close();
-                client.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        }
-        return response;
+        return executeHttpRequest(getRequest);
     }
 
     protected Response put() {
-        CloseableHttpClient client = getClient();
-        RequestBuilder getRequest = RequestBuilder.put().setUri(url);
-        Response response = new Response();
-        response.setMethod(Methods.PUT.getMethod());
-        initHeaders(getRequest);
-        initParams(getRequest);
-
-        CloseableHttpResponse resp = null;
-        try {
-            final HttpUriRequest uriRequest = getRequest.build();
-            resp = client.execute(uriRequest);
-            // but make sure the response gets closed no matter what
-            // even if do not care about its content
-            response.updateResponse(resp);
-            response.setRequestLine(uriRequest.getRequestLine().toString());
-
-
-        } catch (Exception e) {
-            // TODO: log the error
-            e.printStackTrace();
-        } finally {
-            try {
-                resp.close();
-                client.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        }
-        return response;
+        RequestBuilder putRequest = RequestBuilder.put().setUri(url);
+        return executeHttpRequest(putRequest);
     }
 
+
     protected Response head() {
-        CloseableHttpClient client = getClient();
-        RequestBuilder getRequest = RequestBuilder.head().setUri(url);
-        Response response = new Response();
-        response.setMethod(Methods.HEAD.getMethod());
-        initHeaders(getRequest);
-        initParams(getRequest);
 
-        CloseableHttpResponse resp = null;
-        try {
-            final HttpUriRequest uriRequest = getRequest.build();
-            resp = client.execute(uriRequest);
-            // but make sure the response gets closed no matter what
-            // even if do not care about its content
-            response.updateResponse(resp);
-            response.setRequestLine(uriRequest.getRequestLine().toString());
+        RequestBuilder putRequest = RequestBuilder.head().setUri(url);
+        return executeHttpRequest(putRequest);
+    }
 
-        } catch (Exception e) {
-            // TODO: log the error
-            e.printStackTrace();
-        } finally {
-            try {
-                resp.close();
-                client.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
 
-        }
-        return response;
+    protected Response delete() {
+        RequestBuilder deleteRequest = RequestBuilder.delete().setUri(url);
+        return executeHttpRequest(deleteRequest);
     }
 
     /**
@@ -402,4 +352,5 @@ public abstract class Request {
     public String getParam(String paramName) {
         return this.params.get(paramName);
     }
+
 }

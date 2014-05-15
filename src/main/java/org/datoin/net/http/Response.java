@@ -3,10 +3,10 @@ package org.datoin.net.http;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.entity.ContentType;
+import org.apache.http.util.EntityUtils;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.HashMap;
 
 /**
@@ -16,21 +16,22 @@ import java.util.HashMap;
 public class Response {
     private int status;
     private String content;
-    private String contentType;
+    private ContentType contentType;
     private long contentLength;
     private String statusLine ;
     private String requestLine ;
     private String method;
+    private CloseableHttpResponse httpResp;
+    private byte[] contentBytes = null;
+
     private HashMap<String, Object> responseHeaders = new HashMap<String, Object>();
 
     public Response() {
     }
 
-    public Response(int status, String content, String contentType, long contentLength) {
-        this.status = status;
-        this.content = content;
-        this.contentType = contentType;
-        this.contentLength = contentLength;
+    public Response(CloseableHttpResponse httpResp) {
+        this.httpResp = httpResp;
+        updateResponse();
     }
 
     public int getStatus() {
@@ -41,19 +42,11 @@ public class Response {
         this.status = status;
     }
 
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public String getContentType() {
+    public ContentType getContentType() {
         return contentType;
     }
 
-    public void setContentType(String contentType) {
+    public void setContentType(ContentType contentType) {
         this.contentType = contentType;
     }
 
@@ -94,48 +87,53 @@ public class Response {
             responseHeaders.put(header.getName(), header.getValue());
         }
     }
-    private static String parseEntity(HttpEntity resEntity) {
-        String line = "";
-        StringBuilder result = new StringBuilder();
-        BufferedReader rd = null;
-        try {
-            rd = new BufferedReader(new InputStreamReader(resEntity.getContent()));
-            while ((line = rd.readLine()) != null) {
-                result = result.append(line);
-            }
-        } catch (IOException e) {
-            // TODO: log this error
-            e.printStackTrace();
-        }
-        return result.toString();
-    }
 
-    private boolean isTextContent(String contentType){
-        return ( contentType.contains("text") ||
-                contentType.contains("json") ||
-                contentType.contains("xml"));
-    }
     /**
      * update Response object from given http response
-     * @param resp
      */
-    public void updateResponse(CloseableHttpResponse resp){
+    public void updateResponse(){
         // TODO: update logging
-        setStatus(resp.getStatusLine().getStatusCode());
-        setStatusLine(resp.getStatusLine().toString());
-        setHeaders(resp.getAllHeaders());
-        final HttpEntity entity = resp.getEntity();
+        setStatus(httpResp.getStatusLine().getStatusCode());
+        setStatusLine(httpResp.getStatusLine().toString());
+        setHeaders(httpResp.getAllHeaders());
+        final HttpEntity entity = httpResp.getEntity();
         if(entity != null) {
-            final Header contentTypeVal = entity.getContentType();
-            if(contentTypeVal != null) {
-                setContentType(contentTypeVal.getValue());
+            try {
+                contentBytes = EntityUtils.toByteArray(entity);
+            } catch (IOException e) {
+                contentBytes = new byte[0]; // empty byte array
+                e.printStackTrace();
             }
+            ContentType contentType = ContentType.getOrDefault(entity);
+            setContentType(contentType);
             setContentLength(entity.getContentLength());
-            if (contentLength != 0 && isTextContent(contentType)) {
-                setContent(parseEntity(entity));
+        }
+        System.out.println(this);
+
+    }
+
+    public String getContentAsString(){
+        if (content == null) {
+            HttpEntity entity = httpResp.getEntity();
+
+            if (contentBytes.length > 0 && contentLength != 0) {
+                content = new String(contentBytes, contentType.getCharset());
+            } else {
+                content = "";
             }
         }
+        return content;
+    }
 
+    public byte[] getContentAsByteArray(){
+        return contentBytes;
+    }
+    public CloseableHttpResponse getHttpResp() {
+        return httpResp;
+    }
+
+    public void setHttpResp(CloseableHttpResponse httpResp) {
+        this.httpResp = httpResp;
     }
 
     @Override
@@ -145,9 +143,14 @@ public class Response {
         for(String key : responseHeaders.keySet()){
             sb.append("// ").append(key).append(" : ").append(responseHeaders.get(key)).append("\n");
         }
-        sb.append("\n// Method : ").append(method).append("\n\n\n")
-          .append(content);
+        sb.append("\n// Method : ").append(method);
         return sb.toString();
 
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        if (httpResp != null) httpResp.close();
+        super.finalize();
     }
 }
