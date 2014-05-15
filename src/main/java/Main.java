@@ -1,6 +1,7 @@
 import org.datoin.net.http.Requests;
 import org.datoin.net.http.Response;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Arrays;
 
@@ -12,15 +13,15 @@ public class Main {
     public static void main(String[] args) throws FileNotFoundException {
 
         String hatchUrl = "http://node5:8090/falcon/hatch";
-        final Response response = Requests.delete("http://localhost:8181/datoin/")
-                .setParam("userId", "1")
+        final Response response = Requests.post("http://localhost:8181/datoin/")
+          /*      .setParam("userId", "1")
                 .accept("application/json").accept("text/plain")
                 .userAgent("myself-test/1.0")
                 .setParam("className", "com.datoin.modules.example.IdentityModule")
-                .socketTimeOut(100000)
-          /*      .addInputStream("file", new File(
-                        "/home/umar/.m2/repository/com/datoin/modules/examples/identity-module/1.0.1/identity-module-1.0.1.jar"))*/
-                .execute();
+                .socketTimeOut */
+                .postContent(new File(
+                        "/home/umar/.m2/repository/com/datoin/modules/examples/identity-module/1.0.1/identity-module-1.0.1.jar"));
+                //.execute();
         System.out.println(response);
         System.out.println(response.getContentAsString());
         System.out.println(Arrays.toString(response.getContentAsByteArray()));

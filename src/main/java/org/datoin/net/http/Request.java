@@ -1,6 +1,7 @@
 package org.datoin.net.http;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -35,7 +36,7 @@ public abstract class Request {
     public abstract Response execute();
 
 
-    private CloseableHttpClient getClient(){
+   protected CloseableHttpClient getClient(){
         RequestConfig rConf = RequestConfig.custom()
                 .setSocketTimeout(socketTimeOutMillis)
                 .setConnectTimeout(connectionTimeOutMillis)
@@ -45,7 +46,7 @@ public abstract class Request {
         return client;
     }
 
-    private void initHeaders(RequestBuilder req){
+    protected void initHeaders(RequestBuilder req){
         if (headers != null) {
             for (Map.Entry<String, String> param : headers.entrySet()) {
                 req.addHeader(param.getKey(), param.getValue());
@@ -53,7 +54,7 @@ public abstract class Request {
         }
     }
 
-    private void initParams(RequestBuilder req){
+    protected void initParams(RequestBuilder req){
         if (params != null) {
             for (Map.Entry<String, String> param : params.entrySet()) {
                 req.addParameter(param.getKey(), param.getValue());
@@ -103,7 +104,7 @@ public abstract class Request {
         return response;
     }
 
-    private Response executeHttpRequest(RequestBuilder httpRequest){
+    protected Response executeHttpRequest(RequestBuilder httpRequest){
         CloseableHttpClient client = getClient();
         initHeaders(httpRequest);
         initParams(httpRequest);
@@ -353,4 +354,28 @@ public abstract class Request {
         return this.params.get(paramName);
     }
 
+    protected Response getResponse(HttpEntity entity, RequestBuilder req) {
+        CloseableHttpClient client = getClient();
+        initHeaders(req);
+        req.setEntity(entity);
+        CloseableHttpResponse resp = null;
+        Response response = null;
+        try {
+            final HttpUriRequest uriRequest = req.build();
+            resp = client.execute(uriRequest);
+            response = new Response(resp);
+            response.setMethod(Methods.POST.getMethod());
+            response.setRequestLine(uriRequest.getRequestLine().toString());
+        } catch (Exception e) {
+            // TODO: log the error
+            e.printStackTrace();
+        } finally {
+            try {
+                client.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return response;
+    }
 }
