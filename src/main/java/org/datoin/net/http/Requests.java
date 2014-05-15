@@ -1,9 +1,6 @@
 package org.datoin.net.http;
 
-import org.datoin.net.http.methods.Get;
-import org.datoin.net.http.methods.Head;
-import org.datoin.net.http.methods.Post;
-import org.datoin.net.http.methods.Put;
+import org.datoin.net.http.methods.*;
 
 /**
  * Author : umarshah@simplyphi.com
@@ -22,4 +19,6 @@ public class Requests {
     public static Put put(String url) { return new Put(url);}
 
     public static Head head(String url) { return new Head(url);}
+
+    public static Delete delete(String url) { return new Delete(url);}
 }

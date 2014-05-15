@@ -8,7 +8,8 @@ public enum Methods {
     GET ("GET"),
     POST ("POST"),
     PUT ("PUT"),
-    HEAD ("HEAD");
+    HEAD ("HEAD"),
+    DELETE ("DELETE");
 
 
     private String method;
