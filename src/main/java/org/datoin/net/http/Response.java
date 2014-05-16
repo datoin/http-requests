@@ -7,6 +7,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 
 /**
@@ -18,8 +19,8 @@ public class Response {
     private String content;
     private ContentType contentType;
     private long contentLength;
-    private String statusLine ;
-    private String requestLine ;
+    private String statusLine;
+    private String requestLine;
     private String method;
     private CloseableHttpResponse httpResp;
     private byte[] contentBytes = null;
@@ -82,8 +83,8 @@ public class Response {
         this.requestLine = requestLine;
     }
 
-    public void setHeaders(Header[] headers){
-        for(Header header : headers){
+    public void setHeaders(Header[] headers) {
+        for (Header header : headers) {
             responseHeaders.put(header.getName(), header.getValue());
         }
     }
@@ -91,13 +92,13 @@ public class Response {
     /**
      * update Response object from given http response
      */
-    public void updateResponse(){
+    public void updateResponse() {
         // TODO: update logging
         setStatus(httpResp.getStatusLine().getStatusCode());
         setStatusLine(httpResp.getStatusLine().toString());
         setHeaders(httpResp.getAllHeaders());
         final HttpEntity entity = httpResp.getEntity();
-        if(entity != null) {
+        if (entity != null) {
             try {
                 contentBytes = EntityUtils.toByteArray(entity);
             } catch (IOException e) {
@@ -112,12 +113,17 @@ public class Response {
 
     }
 
-    public String getContentAsString(){
+    public String getContentAsString() {
         if (content == null) {
             HttpEntity entity = httpResp.getEntity();
 
             if (contentBytes.length > 0 && contentLength != 0) {
-                content = new String(contentBytes, contentType.getCharset());
+                Charset charset = contentType.getCharset();
+                if (charset != null) {
+                    content = new String(contentBytes, charset);
+                } else {
+                    content = new String(contentBytes);
+                }
             } else {
                 content = "";
             }
@@ -125,9 +131,10 @@ public class Response {
         return content;
     }
 
-    public byte[] getContentAsByteArray(){
+    public byte[] getContentAsByteArray() {
         return contentBytes;
     }
+
     public CloseableHttpResponse getHttpResp() {
         return httpResp;
     }
@@ -137,10 +144,10 @@ public class Response {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         StringBuilder sb = new StringBuilder("// Request: ");
         sb.append(requestLine).append("\n// Status: ").append(statusLine).append("\n// Headers:\n");
-        for(String key : responseHeaders.keySet()){
+        for (String key : responseHeaders.keySet()) {
             sb.append("// ").append(key).append(" : ").append(responseHeaders.get(key)).append("\n");
         }
         sb.append("\n// Method : ").append(method);

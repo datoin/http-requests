@@ -10,6 +10,7 @@ public enum RequestHeaderFields {
     ACCEPT_ENCODING("Accept-Encoding"),
     ACCEPT_LANGUAGE("Accept-Language"),
     AUTHORIZATION("Authorization"),
+    CONTENT_TYPE("Content-Type"),
     CHARGE_TO("Charge-To"),
     IF_MODIFIED_SINCE("If-Modified-Since"),
     PRAGMA("Pragma"),

@@ -58,13 +58,16 @@ public class PostTest extends HTTPRequestTest {
         String url = String.format("http://localhost:%s/%s/", PORT, CONTEXT);
         String testText = "this is a test text";
         InputStream is = new ByteArrayInputStream(testText.getBytes());
-        Response response = Requests.post(url).
-                setContent(is, ContentType.TEXT_PLAIN).execute();
+        Response response = Requests.post(url)
+                .setHeader(RequestHeaderFields.CONTENT_TYPE.getName(), ContentType.TEXT_PLAIN.getMimeType())
+                .setContent(is, ContentType.TEXT_PLAIN).execute();
 
         InputStream input= new ByteArrayInputStream(response.getContentAsByteArray());
         Properties props = new Properties();
         props.load(input);
         System.out.print(props);
+        Assert.assertEquals("Method didnt match", ContentType.TEXT_PLAIN.getMimeType(),
+                                props.get(RequestHeaderFields.CONTENT_TYPE.getName()).toString().trim());
         Assert.assertEquals("Method didnt match", "POST", props.get("Method").toString().trim());
         Assert.assertEquals("content text didnt match", testText, props.get("content").toString().trim());
 
