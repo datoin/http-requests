@@ -7,6 +7,10 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.client.utils.HttpClientUtils;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.FileEntity;
+import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -28,6 +32,7 @@ public abstract class Request {
     protected HashMap<String, String> headers = new HashMap<String, String>();
     protected HashMap<String, String> params = new HashMap<String, String>();
     protected HashMap<String, InputStream> postStreams = new HashMap<String, InputStream>();
+    private HttpEntity entity = null;
 
     protected Request(String url) {
         this.url = url;
@@ -62,56 +67,18 @@ public abstract class Request {
         }
     }
 
-    /**
-     * execute a post request for this Request object
-     * @return  : Response object built from the http resposne
-     */
-    protected Response post() {
-        CloseableHttpClient client = getClient();
-        RequestBuilder postRequest = RequestBuilder.post().setUri(url);
-        initHeaders(postRequest);
-        Response response = null;
-
-
-
-        final MultipartEntityBuilder reqEntity = MultipartEntityBuilder.create();
-        for (Map.Entry<String, String> param : params.entrySet()) {
-            reqEntity.addTextBody(param.getKey(), param.getValue());
-        }
-
-        for (String streamName : postStreams.keySet()) {
-            reqEntity.addBinaryBody(streamName, postStreams.get(streamName));
-        }
-
-        postRequest.setEntity(reqEntity.build());
-        CloseableHttpResponse resp = null;
-        try {
-            final HttpUriRequest uriRequest = postRequest.build();
-            resp = client.execute(uriRequest);
-            response = new Response(resp);
-            response.setMethod(Methods.POST.getMethod());
-            response.setRequestLine(uriRequest.getRequestLine().toString());
-        } catch (Exception e) {
-            // TODO: log the error
-            e.printStackTrace();
-        } finally {
-            try {
-                client.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return response;
-    }
-
     protected Response executeHttpRequest(RequestBuilder httpRequest){
         CloseableHttpClient client = getClient();
         initHeaders(httpRequest);
         initParams(httpRequest);
         Response response = null;
         CloseableHttpResponse resp = null;
+        if( entity !=null ){
+            httpRequest.setEntity(entity);
+        }
         try {
             final HttpUriRequest uriRequest = httpRequest.build();
+
             resp = client.execute(uriRequest);
             // but make sure the response gets closed no matter what
             // even if do not care about its content
@@ -136,22 +103,69 @@ public abstract class Request {
         return executeHttpRequest(getRequest);
     }
 
-    protected Response put() {
-        RequestBuilder putRequest = RequestBuilder.put().setUri(url);
-        return executeHttpRequest(putRequest);
-    }
-
-
     protected Response head() {
-
         RequestBuilder putRequest = RequestBuilder.head().setUri(url);
         return executeHttpRequest(putRequest);
     }
 
-
     protected Response delete() {
-        RequestBuilder deleteRequest = RequestBuilder.delete().setUri(url);
-        return executeHttpRequest(deleteRequest);
+        RequestBuilder builder = RequestBuilder.delete().setUri(url);
+        return getResponseAfterDetectingType(builder);
+    }
+
+    /**
+     * execute a post request for this Request object
+     * @return  : Response object built from the http resposne
+     */
+    protected Response post() {
+        RequestBuilder builder = RequestBuilder.post().setUri(url);
+        return getResponseAfterDetectingType(builder);
+    }
+
+    protected Response put() {
+        RequestBuilder builder = RequestBuilder.put().setUri(url);
+        return getResponseAfterDetectingType(builder);
+
+    }
+
+    private Response getResponseAfterDetectingType(RequestBuilder builder) {
+        // check whether post is a multipart body request
+        if(entity != null || postStreams.size() ==0){
+            return executeHttpRequest(builder);
+        }
+
+        return getResponseFromMultiPartRequest(builder);
+    }
+
+    private Response getResponseFromMultiPartRequest(RequestBuilder request) {
+        CloseableHttpClient client = getClient();
+        initHeaders(request);
+        Response response = null;
+
+        final MultipartEntityBuilder reqEntity = MultipartEntityBuilder.create();
+        for (Map.Entry<String, String> param : params.entrySet()) {
+            reqEntity.addTextBody(param.getKey(), param.getValue());
+        }
+
+        for (String streamName : postStreams.keySet()) {
+            reqEntity.addBinaryBody(streamName, postStreams.get(streamName));
+        }
+
+        request.setEntity(reqEntity.build());
+        CloseableHttpResponse resp = null;
+        try {
+            final HttpUriRequest uriRequest = request.build();
+            resp = client.execute(uriRequest);
+            response = new Response(resp);
+            response.setMethod(Methods.POST.getMethod());
+            response.setRequestLine(uriRequest.getRequestLine().toString());
+        } catch (Exception e) {
+            // TODO: log the error
+            e.printStackTrace();
+        } finally {
+            HttpClientUtils.closeQuietly(client);
+        }
+        return response;
     }
 
     /**
@@ -344,6 +358,49 @@ public abstract class Request {
         return this.headers.get(headerName);
     }
 
+    /**
+     * set request content from input text string
+     * @param text
+     * @return modified Request object
+     * @throws UnsupportedEncodingException
+     */
+    public Request setContent(String text) throws UnsupportedEncodingException {
+        entity = new StringEntity(text);
+        return this;
+    }
+
+    /**
+     * set request content from input text string with given content type
+     * @param text
+     * @return modified Request object
+     * @throws UnsupportedEncodingException
+     */
+    public Request setContent(String text, ContentType contentType) {
+        entity = new StringEntity(text, contentType);
+        return this;
+    }
+
+    /**
+     * set request content from input stream with given content type
+     * @param stream
+     * @return modified Request object
+     * @throws UnsupportedEncodingException
+     */
+    public Request setContent(InputStream stream, ContentType contentType) {
+        entity = new InputStreamEntity(stream, contentType);
+        return this;
+    }
+
+    /**
+     * set request content from input File
+     * @param file
+     * @return modified Request object
+     * @throws UnsupportedEncodingException
+     */
+    public Request setContent(File file) {
+        entity = new FileEntity(file);
+        return this;
+    }
 
     /**
      * get specific param value

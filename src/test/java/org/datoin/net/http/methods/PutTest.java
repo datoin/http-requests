@@ -1,11 +1,14 @@
 package org.datoin.net.http.methods;
 
-import junit.framework.Assert;
 import org.apache.http.entity.ContentType;
 import org.datoin.net.http.HTTPRequestTest;
 import org.datoin.net.http.RequestHeaderFields;
 import org.datoin.net.http.Requests;
 import org.datoin.net.http.Response;
+import org.eclipse.jetty.server.Server;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -13,6 +16,22 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class PutTest extends HTTPRequestTest {
+    public static final int PORT = 6667;
+    private static Server server = null;
+    @BeforeClass
+    public static void startServer() throws Exception {
+        System.out.println("Starting JETTY Server for PUT");
+        server = getJettyServer(PORT);
+        server.start();
+    }
+
+    @AfterClass
+    public static void stopServer() throws Exception {
+        if (server != null){
+            System.out.println("Stopping JETTY Server");
+            server.stop();
+        }
+    }
 
     @Test
     public void testExecute() throws Exception {
@@ -42,7 +61,7 @@ public class PutTest extends HTTPRequestTest {
         String testText = "this is a test text";
         InputStream is = new ByteArrayInputStream(testText.getBytes());
         Response response = Requests.put(url).
-                putContent(is, ContentType.TEXT_PLAIN);
+                setContent(is, ContentType.TEXT_PLAIN).execute();
 
         InputStream input= new ByteArrayInputStream(response.getContentAsByteArray());
         Properties props = new Properties();

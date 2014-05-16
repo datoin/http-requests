@@ -55,6 +55,14 @@ public class TestServlet extends HttpServlet {
         handleRequest(request, response, "DELETE");
     }
 
+    /**
+     * Handle all requests GET/PUT/DELETE/POST/HEAD comming to the servlet
+     * and returns a plain text suitable for a property fiile with all header fileds and values
+     * @param request   : request object from servlet container
+     * @param response  : response object used to write back response
+     * @param method    : the request method (GET/PUT/DELETE/POST/HEAD ) that was used for this request
+     * @throws IOException
+     */
     private void handleRequest(HttpServletRequest request,
                                HttpServletResponse response, String method) throws IOException {
         PrintWriter out = response.getWriter();
@@ -90,12 +98,5 @@ public class TestServlet extends HttpServlet {
 
     public void destroy() {
         // do nothing.
-    }
-
-    public static void main(String[] args) throws Exception {
-
-
-
-
     }
 }
