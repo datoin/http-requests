@@ -1,40 +1,21 @@
 package org.datoin.net.http.methods;
 
 import org.apache.http.entity.ContentType;
-import org.datoin.net.http.HTTPRequestTest;
 import org.datoin.net.http.RequestHeaderFields;
 import org.datoin.net.http.Requests;
 import org.datoin.net.http.Response;
-import org.datoin.net.http.methods.Methods;
-import org.eclipse.jetty.server.Server;
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Properties;
 
-public class DeleteTest extends HTTPRequestTest {
-    public static final int PORT = 6663;
-    private static Server server = null;
-    @BeforeClass
-    public static void startServer() throws Exception {
-        System.out.println("Starting JETTY Server for POST");
-        server = getJettyServer(PORT);
-        server.start();
-    }
+public class DeleteTest {
 
-    @AfterClass
-    public static void stopServer() throws Exception {
-        if (server != null){
-            server.stop();
-        }
-    }
     @Test
     public void testExecute() throws Exception {
-        String url = String.format("http://localhost:%s/%s/", PORT, CONTEXT);
+        String url = String.format("http://localhost:%s/%s/", RequestsTestSuite.PORT, RequestsTestSuite.CONTEXT);
         String headerValue = "text/plain";
         String userAgentValue = "mytest/1.0";
         Response response = Requests.delete(url)
@@ -55,7 +36,7 @@ public class DeleteTest extends HTTPRequestTest {
 
     @Test
     public void testDeleteContent() throws Exception {
-        String url = String.format("http://localhost:%s/%s/", PORT, CONTEXT);
+        String url = String.format("http://localhost:%s/%s/", RequestsTestSuite.PORT, RequestsTestSuite.CONTEXT);
         String testText = "this is a test text";
         InputStream is = new ByteArrayInputStream(testText.getBytes());
         Response response = Requests.delete(url).

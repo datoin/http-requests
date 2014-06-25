@@ -1,24 +1,25 @@
 package org.datoin.net.http;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class RequestTest {
 
-    @org.junit.Test
+    @Test
     public void testRequest() throws Exception {
         final String url = "test.com";
         final Request req = Requests.get(url);
         Assert.assertEquals("url does not match", url, req.getUrl());
     }
 
-    @org.junit.Test
+    @Test
     public void testSetHeader() throws Exception {
         final Request req = Requests.get("test.com").setHeader("alpha", "beta");
         Assert.assertEquals("Set Header Mismatch", "beta", req.getHeader("alpha"));
 
     }
 
-    @org.junit.Test
+    @Test
     public void testAccept() throws Exception {
         final Request req = Requests.post("").accept("everything");
         Assert.assertEquals("Accept Header mismatch", "everything",
@@ -26,7 +27,7 @@ public class RequestTest {
 
     }
 
-    @org.junit.Test
+    @Test
     public void testAcceptEncoding() throws Exception {
         final String encoding = "some encoding";
         final Request req = Requests.head("anything").acceptEncoding(encoding);
@@ -34,7 +35,7 @@ public class RequestTest {
                 req.getHeader(RequestHeaderFields.ACCEPT_ENCODING.getName()));
     }
 
-    @org.junit.Test
+    @Test
     public void testAcceptLanguage() throws Exception {
         final String language = "some language";
         final Request req = Requests.head("anything").acceptLanguage(language);
@@ -42,7 +43,7 @@ public class RequestTest {
                 req.getHeader(RequestHeaderFields.ACCEPT_LANGUAGE.getName()));
     }
 
-    @org.junit.Test
+    @Test
     public void testUserAgent() throws Exception {
         final String agent = "some agent";
         final Request req = Requests.head("anything").userAgent(agent);
@@ -51,7 +52,7 @@ public class RequestTest {
 
     }
 
-    @org.junit.Test
+    @Test
     public void testReferer() throws Exception {
         final String referer = "some referer";
         final Request req = Requests.put("anything").referer(referer);
@@ -60,7 +61,7 @@ public class RequestTest {
 
     }
 
-    @org.junit.Test
+    @Test
     public void testAuthorization() throws Exception {
         final String authorization = "some authorization";
         final Request req = Requests.put("anything").authorization(authorization);
@@ -70,8 +71,8 @@ public class RequestTest {
 
     }
 
-    @org.junit.Test
-    public void testAuthorize(){
+    @Test
+    public void testAuthorize() {
         final String authorization = "Basic dXNlcm5hbWU6cGFzc3dvcmQ=";
         final Request req = Requests.get("anything").authorize("username", "password");
         Assert.assertEquals("USer Authorization mismatch", authorization,
@@ -80,7 +81,7 @@ public class RequestTest {
 
     }
 
-    @org.junit.Test
+    @Test
     public void testIfModifiedSince() throws Exception {
         final String ifmodsince = "some ifmodsince";
         final Request req = Requests.put("anything").ifModifiedSince(ifmodsince);
@@ -90,7 +91,7 @@ public class RequestTest {
 
     }
 
-    @org.junit.Test
+    @Test
     public void testPragmaNoCache() throws Exception {
         final String pragma = "no-cache";
         final Request req = Requests.get("anything").pragmaNoCache();
@@ -100,16 +101,16 @@ public class RequestTest {
 
     }
 
-    @org.junit.Test
+    @Test
     public void testSetParam() throws Exception {
-        final String  paramNme = "some param";
+        final String paramNme = "some param";
         final String paramValue = "some value";
         final Request req = Requests.head("anything").setParam(paramNme, paramValue);
-        Assert.assertEquals("Param mismatch", paramValue,req.getParam(paramNme));
+        Assert.assertEquals("Param mismatch", paramValue, req.getParam(paramNme));
 
     }
 
-    @org.junit.Test
+    @Test
     public void testGetAndSetConnectionTimeOutMillis() {
         final int connectionTimeOutMillis = 10980;
         final Request req = Requests.post("something").connectionTimeOut(connectionTimeOutMillis);
@@ -118,11 +119,10 @@ public class RequestTest {
                 req.getConnectionTimeOutMillis());
     }
 
-    @org.junit.Test
-    public void testGetAndSetSocketTimeOutMillis()  {
+    @Test
+    public void testGetAndSetSocketTimeOutMillis() {
         final int socketTimeOutMillis = 12100;
         final Request req = Requests.post("something").socketTimeOut(socketTimeOutMillis);
-
         Assert.assertEquals("socket Timeout mismatch", socketTimeOutMillis, req.getSocketTimeOutMillis());
     }
 

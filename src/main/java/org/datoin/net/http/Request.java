@@ -73,7 +73,7 @@ public abstract class Request {
         initParams(httpRequest);
         Response response = null;
         CloseableHttpResponse resp = null;
-        if( entity !=null ){
+        if( entity != null ){
             httpRequest.setEntity(entity);
         }
         try {
@@ -104,8 +104,8 @@ public abstract class Request {
     }
 
     protected Response head() {
-        RequestBuilder putRequest = RequestBuilder.head().setUri(url);
-        return executeHttpRequest(putRequest);
+        RequestBuilder headRequest = RequestBuilder.head().setUri(url);
+        return executeHttpRequest(headRequest);
     }
 
     protected Response delete() {
@@ -130,7 +130,7 @@ public abstract class Request {
 
     private Response getResponseAfterDetectingType(RequestBuilder builder) {
         // check whether post is a multipart body request
-        if(entity != null || postStreams.size() ==0){
+        if(entity != null || postStreams.size() == 0){
             return executeHttpRequest(builder);
         }
 
