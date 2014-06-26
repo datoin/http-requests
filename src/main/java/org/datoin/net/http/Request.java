@@ -173,7 +173,7 @@ public abstract class Request {
      *
      * @param name  : header name
      * @param value : header value
-     * @return
+     * @return  : Request Object with header value set
      */
     public Request setHeader(String name, String value) {
         this.headers.put(name, value);
@@ -183,7 +183,7 @@ public abstract class Request {
     /**
      * sets the accept header for the request, if exists then appends
      * @param headerValue   : header field value to add
-     * @return
+     * @return  : Request Object with accept header value set
      */
     public Request accept(String headerValue){
         final String accept = RequestHeaderFields.ACCEPT.getName();
@@ -199,7 +199,7 @@ public abstract class Request {
     /**
      * sets the accept encoding header for the request, if exists then appends
      * @param encoding   : header field value to add
-     * @return
+     * @return : Request Object with accept encoding header value set
      */
     public Request acceptEncoding(String encoding){
         final String acceptEncoding = RequestHeaderFields.ACCEPT_ENCODING.getName();
@@ -215,7 +215,7 @@ public abstract class Request {
     /**
      * sets the accept language header for the request, if exists then appends
      * @param language   : header field value to add
-     * @return
+     * @return : Request Object with accept language header value set
      */
     public Request acceptLanguage(String language){
         final String acceptLanguage = RequestHeaderFields.ACCEPT_LANGUAGE.getName();
@@ -231,7 +231,7 @@ public abstract class Request {
     /**
      * sets the user agent header for the request, if exists then appends
      * @param userAgentValue   : header field value to add
-     * @return
+     * @return : Request Object with userAgent header value set
      */
     public Request userAgent(String userAgentValue){
         final String userAgent = RequestHeaderFields.USER_AGENT.getName();
@@ -247,7 +247,7 @@ public abstract class Request {
     /**
      * sets the Referer header for the request
      * @param refererValue   : header field value to add
-     * @return
+     * @return : Request Object with referer header value set
      */
     public Request referer(String refererValue){
         final String referer = RequestHeaderFields.REFERER.getName();
@@ -257,13 +257,19 @@ public abstract class Request {
     /**
      * sets the Authorization  header for the request
      * @param authorizationValue   : header field value to add
-     * @return
+     * @return : Request Object with authorization header value set
      */
     public Request authorization(String authorizationValue){
         final String authorization = RequestHeaderFields.AUTHORIZATION.getName();
         return this.setHeader(authorization, authorizationValue);
     }
 
+    /**
+     * method to set authorization header after computing digest from user and pasword
+     * @param name  : username
+     * @param password : password
+     * @return  : Request Object with authorization header value set
+     */
     public Request authorize(String name, String password){
         String authString = name + ":" + password;
         System.out.println("auth string: " + authString);
@@ -277,7 +283,7 @@ public abstract class Request {
     /**
      * sets the if modified since header for the request (use with GET only)
      * @param dateSince   : header field value to add
-     * @return
+     * @return  : Request Object with if_modified_since header value set
      */
     public Request ifModifiedSince(String dateSince){
         final String ifmodsin = RequestHeaderFields.IF_MODIFIED_SINCE.getName();
@@ -286,7 +292,7 @@ public abstract class Request {
 
     /**
      * sets the Pragma no-cache header for the request
-     * @return
+     * @return : Request Object with pragma no cache  header value set
      */
     public Request pragmaNoCache(){
         final String pragma = RequestHeaderFields.PRAGMA.getName();
@@ -297,7 +303,7 @@ public abstract class Request {
      * set a request param and return modified request
      * @param name  : name of teh request param
      * @param value : value of teh request param
-     * @return
+     * @return : Request Object with request param name, value set
      */
     public Request setParam(String name, String value) {
         this.params.put(name, value);
@@ -313,7 +319,7 @@ public abstract class Request {
     /**
      * set connection timeout
      * @param connectionTimeOutMillis   : milliseconds to timeout connection
-     * @return
+     * @return : Request Object with connection timeout value set
      */
     public Request connectionTimeOut(int connectionTimeOutMillis) {
         this.connectionTimeOutMillis = connectionTimeOutMillis;
@@ -327,7 +333,7 @@ public abstract class Request {
     /**
      * set socket time out
      * @param socketTimeOutMillis   : milliseconds to timeout socket transaction
-     * @return
+     * @return  : Request Object with socket time out value set
      */
     public Request socketTimeOut(int socketTimeOutMillis) {
         this.socketTimeOutMillis = socketTimeOutMillis;
@@ -360,9 +366,9 @@ public abstract class Request {
 
     /**
      * set request content from input text string
-     * @param text
+     * @param text : text to send as http content
      * @return modified Request object
-     * @throws UnsupportedEncodingException
+     * @throws UnsupportedEncodingException : can throw exception on encoding issues
      */
     public Request setContent(String text) throws UnsupportedEncodingException {
         entity = new StringEntity(text);
@@ -371,9 +377,9 @@ public abstract class Request {
 
     /**
      * set request content from input text string with given content type
-     * @param text
-     * @return modified Request object
-     * @throws UnsupportedEncodingException
+     * @param text  : text to be sent as http content
+     * @param contentType   : type of content set in header
+     * @return  : Request Object with content type header and conetnt entity value set
      */
     public Request setContent(String text, ContentType contentType) {
         entity = new StringEntity(text, contentType);
@@ -382,9 +388,9 @@ public abstract class Request {
 
     /**
      * set request content from input stream with given content type
-     * @param stream
-     * @return modified Request object
-     * @throws UnsupportedEncodingException
+     * @param stream    : teh input stream to be used as http content
+     * @param contentType   : type of content set in header
+     * @return modified Request object with http content entity set
      */
     public Request setContent(InputStream stream, ContentType contentType) {
         entity = new InputStreamEntity(stream, contentType);
@@ -393,9 +399,8 @@ public abstract class Request {
 
     /**
      * set request content from input File
-     * @param file
-     * @return modified Request object
-     * @throws UnsupportedEncodingException
+     * @param file  : input file to be used as http content
+     * @return modified Request object with http content set as file entity
      */
     public Request setContent(File file) {
         entity = new FileEntity(file);
@@ -411,6 +416,12 @@ public abstract class Request {
         return this.params.get(paramName);
     }
 
+    /**
+     * get response from preconfigured http entity and request builder
+     * @param entity : http entity to be used in request
+     * @param req    : request builder object to build the http request
+     * @return  : Response object prepared after executing the request
+     */
     protected Response getResponse(HttpEntity entity, RequestBuilder req) {
         CloseableHttpClient client = getClient();
         initHeaders(req);
