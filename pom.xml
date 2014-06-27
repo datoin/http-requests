@@ -6,8 +6,32 @@
 
     <groupId>org.datoin.net</groupId>
     <artifactId>http-requests</artifactId>
-    <version>0.1.5</version>
+    <version>0.2.0</version>
 
+    <name>HTTP Requests</name>
+    <description>Simplified HTTP client by datoin team</description>
+    <url>https://github.com/datoin/http-requests</url>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>git@github.com:datoin/http-requests.git</url>
+        <connection>git@github.com:datoin/http-requests.git</connection>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>umars</id>
+            <name>Umar Shah</name>
+            <email>umarshah@simplyphi.com</email>
+        </developer>
+    </developers>
     <distributionManagement>
         <repository>
             <id>simplyphi-internal</id>
