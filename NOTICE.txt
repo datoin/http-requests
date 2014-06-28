@@ -1,0 +1,5 @@
+   Datoin HTTP Server
+   Copyright 2010-2014 Simplyphi Software Solutions
+
+   This product includes software developed at
+   The Apache Software Foundation (http://www.apache.org/).
