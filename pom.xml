@@ -8,6 +8,11 @@
     <artifactId>http-requests</artifactId>
     <version>0.2.0</version>
 
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
     <name>HTTP Requests</name>
     <description>Simplified HTTP client by datoin team</description>
     <url>https://github.com/datoin/http-requests</url>
@@ -21,8 +26,9 @@
     </licenses>
 
     <scm>
+        <connection>scm:git:git@github.com:datoin/http-requests.git</connection>
+        <developerConnection>git@github.com:datoin/http-requests.git</developerConnection>
         <url>git@github.com:datoin/http-requests.git</url>
-        <connection>git@github.com:datoin/http-requests.git</connection>
     </scm>
 
     <developers>
@@ -30,6 +36,11 @@
             <id>umars</id>
             <name>Umar Shah</name>
             <email>umarshah@simplyphi.com</email>
+        </developer>
+        <developer>
+            <id>thammegowda</id>
+            <name>Thamme Gowda</name>
+            <email>thammegowda@simplyphi.com</email>
         </developer>
     </developers>
     <distributionManagement>
