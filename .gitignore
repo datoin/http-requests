@@ -1,4 +1,4 @@
 /.idea/*
 /http-requests.iml
 /target/*
-/.gitignore~
+/**/*~
