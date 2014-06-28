@@ -27,7 +27,7 @@
 
     <scm>
         <connection>scm:git:git@github.com:datoin/http-requests.git</connection>
-        <developerConnection>git@github.com:datoin/http-requests.git</developerConnection>
+        <developerConnection>scm:git:git@github.com:datoin/http-requests.git</developerConnection>
         <url>git@github.com:datoin/http-requests.git</url>
     </scm>
 
@@ -43,13 +43,7 @@
             <email>thammegowda@simplyphi.com</email>
         </developer>
     </developers>
-    <distributionManagement>
-        <repository>
-            <id>simplyphi-internal</id>
-            <name>simplyphi Internal Repository</name>
-            <url>http://maven.simplyphi.com/internal</url>
-        </repository>
-    </distributionManagement>
+
     <properties>
         <jetty-server.version>9.1.3.v20140225</jetty-server.version>
     </properties>
