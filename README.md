@@ -11,6 +11,7 @@ HTTP-REQUESTS
 ```xml
     <dependency>
         <groupId>org.datoin.net</groupId>
+        <artifactId>http-requests</artifactId>
         <version>0.2.1</version>
     </dependency>
 ```
