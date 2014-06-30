@@ -7,7 +7,13 @@ HTTP-REQUESTS
    Apache License
    Version 2.0, January 2004 http://www.apache.org/licenses/
 
-
+### POM FILE ENTRY
+```xml
+    <dependency>
+        <groupId>org.datoin.net</groupId>
+        <version>0.2.1</version>
+    </dependency>
+```
 ### EXAMPLES 
 
 #### 1. GET
