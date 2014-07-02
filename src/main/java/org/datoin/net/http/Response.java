@@ -26,11 +26,15 @@ public class Response {
     private byte[] contentBytes = null;
 
     private HashMap<String, Object> responseHeaders = new HashMap<String, Object>();
+    private boolean debug;
 
     public Response() {
+        String envDebug = System.getenv("ORG_DATOIN_DEBUG");
+        debug = envDebug != null;
     }
 
     public Response(CloseableHttpResponse httpResp) {
+        this();
         this.httpResp = httpResp;
         updateResponse();
     }
@@ -109,7 +113,8 @@ public class Response {
             setContentType(contentType);
             setContentLength(entity.getContentLength());
         }
-        System.out.println(this);
+        if(debug)
+            System.err.println(this);
 
     }
 
@@ -152,7 +157,6 @@ public class Response {
         }
         sb.append("\n// Method : ").append(method);
         return sb.toString();
-
     }
 
     @Override
