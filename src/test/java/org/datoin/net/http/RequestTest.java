@@ -3,6 +3,8 @@ package org.datoin.net.http;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Arrays;
+
 public class RequestTest {
 
     @Test
@@ -104,10 +106,12 @@ public class RequestTest {
     @Test
     public void testSetParam() throws Exception {
         final String paramNme = "some param";
-        final String paramValue = "some value";
-        final Request req = Requests.head("anything").setParam(paramNme, paramValue);
-        Assert.assertEquals("Param mismatch", paramValue, req.getParam(paramNme));
-
+        final String paramValue1 = "some value1";
+        final String paramValue2 = "some value2";
+        final Request req = Requests.head("anything")
+                .setParam(paramNme, paramValue1).setParam(paramNme, paramValue2);
+        Assert.assertEquals("Param mismatch", paramValue1, req.getFirstParam(paramNme));
+        Assert.assertEquals("Param mismatch", Arrays.asList(paramValue1, paramValue2), req.getParam(paramNme));
     }
 
     @Test
