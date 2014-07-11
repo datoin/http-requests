@@ -2,3 +2,5 @@
 /http-requests.iml
 /target/*
 /**/*~
+/http-requests.ipr
+/http-requests.iws
