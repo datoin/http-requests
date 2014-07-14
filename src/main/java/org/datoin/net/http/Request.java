@@ -1,5 +1,7 @@
 package org.datoin.net.http;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
@@ -17,6 +19,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.datoin.net.http.methods.Methods;
 
 import java.io.*;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,8 +33,9 @@ public abstract class Request {
     private int connectionTimeOutMillis = 180000;    // default 3 minutes
     private int socketTimeOutMillis = 1800000;    // default 30 minutes
     protected HashMap<String, String> headers = new HashMap<String, String>();
-    protected HashMap<String, String> params = new HashMap<String, String>();
+    //protected HashMap<String, String> params = new HashMap<String, String>();
     protected HashMap<String, InputStream> postStreams = new HashMap<String, InputStream>();
+    protected Multimap<String, String> params = ArrayListMultimap.create();
     private HttpEntity entity = null;
 
     protected Request(String url) {
@@ -41,7 +45,7 @@ public abstract class Request {
     public abstract Response execute();
 
 
-   protected CloseableHttpClient getClient(){
+    protected CloseableHttpClient getClient(){
         RequestConfig rConf = RequestConfig.custom()
                 .setSocketTimeout(socketTimeOutMillis)
                 .setConnectTimeout(connectionTimeOutMillis)
@@ -61,7 +65,7 @@ public abstract class Request {
 
     protected void initParams(RequestBuilder req){
         if (params != null) {
-            for (Map.Entry<String, String> param : params.entrySet()) {
+            for (Map.Entry<String, String> param : params.entries()) {
                 req.addParameter(param.getKey(), param.getValue());
             }
         }
@@ -143,7 +147,8 @@ public abstract class Request {
         Response response = null;
 
         final MultipartEntityBuilder reqEntity = MultipartEntityBuilder.create();
-        for (Map.Entry<String, String> param : params.entrySet()) {
+
+        for (Map.Entry<String, String> param : params.entries()) {
             reqEntity.addTextBody(param.getKey(), param.getValue());
         }
 
@@ -304,9 +309,21 @@ public abstract class Request {
      * @param name  : name of teh request param
      * @param value : value of teh request param
      * @return : Request Object with request param name, value set
+     * @see {@link org.datoin.net.http.Request#setParam(String, Iterable)}
      */
     public Request setParam(String name, String value) {
         this.params.put(name, value);
+        return this;
+    }
+
+    /**
+     * set a request param and return modified request
+     * @param name  : name of the request param
+     * @param values : values of the request param
+     * @return : Request Object with request param name, value set
+     */
+    public Request setParam(String name, Iterable<String> values) {
+        this.params.putAll(name, values);
         return this;
     }
 
@@ -408,11 +425,25 @@ public abstract class Request {
     }
 
     /**
+     * gets first value of specific param.
+     * @param paramName    : name of the param to fetch value for
+     * @return  : first value in the collection  corresponding param name if found, otherwise <code>null</code>
+     */
+    public String getFirstParam(String paramName) {
+        Collection<String> values = this.params.get(paramName);
+        if(values == null || values.isEmpty()) {
+            return null;
+        } else {
+            return values.iterator().next();
+        }
+    }
+
+    /**
      * get specific param value
      * @param paramName    : name of the param to fetch value for
      * @return  : value of corresponding param name
      */
-    public String getParam(String paramName) {
+    public java.util.Collection<String> getParam(String paramName) {
         return this.params.get(paramName);
     }
 
