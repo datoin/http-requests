@@ -309,7 +309,6 @@ public abstract class Request {
      * @param name  : name of teh request param
      * @param value : value of teh request param
      * @return : Request Object with request param name, value set
-     * @see {@link org.datoin.net.http.Request#setParam(String, Iterable)}
      */
     public Request setParam(String name, String value) {
         this.params.put(name, value);
